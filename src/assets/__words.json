@@ -1,0 +1,29 @@
+{
+    "title": "Выберите правильное написание слова",
+    "wordList":
+[
+	{
+		"word": "странный",
+		"variantsTemplate": "стра(н/нн)ый"
+
+	},
+	{
+		"word": "камыш",
+		"variantsTemplate": "к(а/о)мыш(ь/)"
+	},
+	{
+
+		"word": "копейка",
+		"variantsTemplate": "к(а/о)пейка"
+	},
+	{
+		"word": "мыслишь",
+		"variantsTemplate": "мыслиш(ь/)"
+	},
+	{
+		"word": "свитер",
+		"variantsTemplate": "свит(е/)р"
+
+	}
+]
+}

@@ -1,0 +1,25 @@
+<div class="card">
+  <div class="card-header"><h2>Результат: <span class="badge {{(resultPercent<70) ? 'badge-danger' : ((resultPercent<85) ? 'badge-warning' : 'badge-success')}}">{{resultPercent}}%</span></h2>
+    <div>Пройдено вопросов: <span class="badge badge-secondary">{{allSuccessCount+allErrorCount}}</span></div>
+  </div>
+  <div class="card-body" [ngSwitch]="learnStatus">
+    <div *ngSwitchCase="status.start">
+      <button (click)="onStartEvent()" class="btn btn-primary">Start</button>
+    </div>
+    <div *ngSwitchCase="status.next">
+      <!--{{taskWord?.word}}<br>-->
+      <div *ngFor="let wrd of taskWord.variants"><label><input (input)="onCheckWord($event)" type="radio" name="word" value="{{wrd}}"> {{wrd}}</label></div>
+      <button (click)="onNextEvent()" class="btn btn-secondary">Next</button>
+    </div>
+  </div>
+  <div class="card-footer">
+    <h4>Ошибок: <span class="badge badge-warning">{{allErrorCount}}</span></h4>
+    <h4>Правильно: <span class="badge badge-success">{{allSuccessCount}}</span></h4>
+  </div>
+</div>
+
+<!--<ul>
+  <li *ngFor="let word of words">
+    <p>___: {{word?.word}} {{word?.errorCount}} {{word?.successCount}}</p>
+  </li>
+</ul>-->
