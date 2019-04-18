@@ -13,5 +13,9 @@ export class RusWordsService {
     // .then(data => );
   }
 
+  saveSession(res) {
+    console.log(res);
+  }
+
   constructor() { }
 }
