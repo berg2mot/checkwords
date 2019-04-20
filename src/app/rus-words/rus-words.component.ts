@@ -18,6 +18,8 @@ export class RusWordsComponent implements OnInit {
   learnStatus: Status;
 
   words: RusWord[] = [];
+  wordsSolved: RusWord[] = [];
+  wordsSave: RusWord[] = [];
   allErrorCount = 0;
   allSuccessCount = 0;
   resultPercent = 0;
@@ -54,19 +56,20 @@ export class RusWordsComponent implements OnInit {
 
   getRandomWord(): RusWord {
     let i = this.getRandomVal(this.words.length); // Math.floor(Math.random() * this.words.length);
-    console.log('RandomWord_i:', i);
-    console.log('RandomWord:', this.words[i]);
+    // console.log('RandomWord_i:', i);
+    // console.log('RandomWord:', this.words[i]);
     while (this.taskWord && this.taskWord.word === this.words[i].word) {
       i = this.getRandomVal(this.words.length);
-      console.log('RandomWord_i:', i);
-      console.log('RandomWord:', this.words[i]);
+      // console.log('RandomWord_i:', i);
+      // console.log('RandomWord:', this.words[i]);
     }
+    this.words[i].i = i;
     return this.words[i];
   }
 
   onNextEvent() {
     this.currentErrors = 0;
-    console.log('onNextEvent!');
+    // console.log('onNextEvent!');
     // this.taskWord = this.getRandomWord();
     // this.taskWord.variants.push(this.taskWord.word);
     this.nextWord();
@@ -75,11 +78,11 @@ export class RusWordsComponent implements OnInit {
   getVariants(tmpl: string): string[] {
     // варианты значений строк для вставки в шаблон слова
     const wordPatternList = tmpl.match(/\(.*?\)/ig).map(x => x.replace(/[\(\)]/g, '')).map(x => x.split('/'));
-    console.log('wordPatternList:', wordPatternList);
+    // console.log('wordPatternList:', wordPatternList);
     let numPattern = 0;
     // let tmplWord = tmpl.replace(/\(.*?\)/g, x => '(' + i++ + ')');
     const tmplWord = tmpl.replace(/\(.*?\)/g, x => '(' + numPattern++ + ')');
-    console.log('tmplWord:', tmplWord);
+    // console.log('tmplWord:', tmplWord);
     // numPattern = 0;
     // let variantList = [];
     // let variantWord = '';
@@ -95,7 +98,7 @@ export class RusWordsComponent implements OnInit {
       // console.log('patternList:', patternList);
     }
     // console.log('patternList_res:', patternList);
-    console.log('patternList_res:', patternListArr);
+    // console.log('patternList_res:', patternListArr);
 
     patternListArr.forEach(p => {
       let wrd = tmplWord;
@@ -106,9 +109,9 @@ export class RusWordsComponent implements OnInit {
         this.taskWord.variants = [];
       }
       this.taskWord.variants.push(wrd);
-      console.log('wrd:'); console.log(wrd);
+      // console.log('wrd:'); console.log(wrd);
     });
-    console.log('this.taskWord.variants:'); console.log(this.taskWord.variants);
+    // console.log('this.taskWord.variants:'); console.log(this.taskWord.variants);
 
     /*wordPatternList.forEach(patternList => {
       numPattern = 0;
@@ -134,7 +137,7 @@ export class RusWordsComponent implements OnInit {
       arr2.forEach(v2 => {
         strArr = [];
         if (Array.isArray(v1)) {
-          console.log('v1:'); console.log(v1);
+          // console.log('v1:'); console.log(v1);
           strArr = v1.slice();
           strArr.push(v2);
           // v1.push(v2);
@@ -142,29 +145,47 @@ export class RusWordsComponent implements OnInit {
         } else {
           strArr.push(v1, v2);
         }
-        console.log('strArr:'); console.log(strArr);
+        // console.log('strArr:'); console.log(strArr);
         resArr.push(strArr);
       });
     });
     return resArr;
   }
 
+  /*
+   * хорошо изученные слова перекидываем в другой массив
+   */
+  filterWords() {
+    if (!this.taskWord) {
+      return;
+    }
+    // console.log('=11=');
+    if ( this.taskWord.successCount >= 3
+         && this.getResultPercent(this.taskWord.successCount, this.taskWord.errorCount) >= 85
+    ) {
+      // console.log('=11=');
+      this.wordsSolved = this.wordsSolved.concat( this.words.splice( this.taskWord.i, 1 ) );
+      console.log('wordsSolved:', this.wordsSolved);
+    }
+  }
+
   nextWord() {
+    this.filterWords();
     this.taskWord = this.getRandomWord();
     // this.taskWord.variants.push(this.taskWord.word);
-    console.log(this.taskWord.variants);
+    // console.log(this.taskWord.variants);
     if (!this.taskWord.variants) {
       this.getVariants(this.taskWord.variantsTemplate);
     }
     this.taskWord.variants.sort(
-      function (a, b) {
+      function(a, b) {
         const rnd = Math.random();
-        console.log(rnd);
+        // console.log(rnd);
         if (rnd < 0.5) { return -1; }
         return 1;
       }
     );
-    console.log(this.taskWord.variants);
+    // console.log(this.taskWord.variants);
     const savedThis = this;
     setTimeout(function() {
       savedThis.learnStatus = Status.next;
@@ -174,7 +195,7 @@ export class RusWordsComponent implements OnInit {
   }
 
   onStartEvent() {
-    console.log('onStartEvent!');
+    // console.log('onStartEvent!');
     this.learnStatus = Status.next;
     this.nextWord();
   }
@@ -187,8 +208,8 @@ export class RusWordsComponent implements OnInit {
     // } else {
     //  val = e;
     // }
-    console.log(val.trim());
-    console.log(this.taskWord.word.trim());
+    // console.log(val.trim());
+    // console.log(this.taskWord.word.trim());
     if (val.trim() === this.taskWord.word.trim()) {
       console.log('WOW!');
       this.taskWord.successCount++;
@@ -206,14 +227,20 @@ export class RusWordsComponent implements OnInit {
         }
       }
     }
-    this.resultPercent = this.getResultPercent();
+    this.resultPercent = this.getResultPercent(this.allSuccessCount, this.allErrorCount);
     // console.log(this);
   }
 
-  getResultPercent(): number {
-    let result = this.allSuccessCount * 100 / (this.allErrorCount + this.allSuccessCount);
+  getResultPercent(successCount: number, errorCount: number): number {
+    let result = successCount * 100 / (errorCount + successCount);
     result = Math.round(result);
     return result;
   }
 
+  save() {
+    console.log('wordsSolved:', this.wordsSolved);
+    // сохраняем только показанные слова
+    const words = this.wordsSolved.concat(this.words.filter(item => item.errorCount > 0 || item.successCount > 0));
+    this.httpService.saveSession(words);
+  }
 }

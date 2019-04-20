@@ -5,4 +5,5 @@ export class RusWord {
   variantsTemplate: string;
   errorCount: number;
   successCount: number;
+  i?: number;
 }
