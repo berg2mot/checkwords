@@ -15,6 +15,10 @@
       <!--<button (click)="onNextEvent()" class="btn btn-secondary">Next</button>-->
       <button (click)="save()" class="btn btn-secondary">Save</button>
     </div>
+    <div *ngSwitchCase="status.end">
+      Поздравляю, тренировка завершена!
+    </div>
+    <div *ngSwitchCase="status.wait">...</div>
   </div>
   <div class="card-footer">
 
@@ -29,6 +33,7 @@
         <div class="card-body text-center">
           <h2>Результат: <span class="badge {{(resultPercent<70) ? 'badge-danger' : ((resultPercent<85) ? 'badge-warning' : 'badge-success')}}">{{resultPercent}}%</span></h2>
           <div>Пройдено вопросов: <span class="badge badge-secondary">{{allSuccessCount+allErrorCount}}</span></div>
+          <div>Изучено слов: {{wordsSolved.length}} из {{words.length + wordsSolved.length}}</div>
         </div>
       </div>
     </div>

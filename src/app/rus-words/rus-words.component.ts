@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 // import {WordsService} from '../learn-rus/words.service';
 // import {Word} from '../learn-rus/word';
 import {Status} from '../share/status.enum';
@@ -18,7 +18,9 @@ export class RusWordsComponent implements OnInit {
   learnStatus: Status;
 
   words: RusWord[] = [];
+  wordsCount = 0;
   wordsSolved: RusWord[] = [];
+  wordsSolvedCount = 0;
   wordsSave: RusWord[] = [];
   allErrorCount = 0;
   allSuccessCount = 0;
@@ -55,10 +57,13 @@ export class RusWordsComponent implements OnInit {
   }
 
   getRandomWord(): RusWord {
+    // if (this.words.length === 0) {
+    //   return null;
+    // }
     let i = this.getRandomVal(this.words.length); // Math.floor(Math.random() * this.words.length);
     // console.log('RandomWord_i:', i);
     // console.log('RandomWord:', this.words[i]);
-    while (this.taskWord && this.taskWord.word === this.words[i].word) {
+    while (this.taskWord && this.taskWord.word === this.words[i].word && this.words.length > 1) {
       i = this.getRandomVal(this.words.length);
       // console.log('RandomWord_i:', i);
       // console.log('RandomWord:', this.words[i]);
@@ -160,7 +165,7 @@ export class RusWordsComponent implements OnInit {
       return;
     }
     // console.log('=11=');
-    if ( this.taskWord.successCount >= 3
+    if ( this.taskWord.successCount >= 1
          && this.getResultPercent(this.taskWord.successCount, this.taskWord.errorCount) >= 85
     ) {
       // console.log('=11=');
@@ -171,7 +176,17 @@ export class RusWordsComponent implements OnInit {
 
   nextWord() {
     this.filterWords();
+    if (this.words.length === 0) {
+      this.learnStatus = Status.end;
+      return;
+    }
     this.taskWord = this.getRandomWord();
+    if (this.words.length === 1) {
+      console.log('this.words.length === 1');
+      // this.taskWord = Object.assign({}, this.taskWord);
+      this.learnStatus = Status.wait;
+    }
+
     // this.taskWord.variants.push(this.taskWord.word);
     // console.log(this.taskWord.variants);
     if (!this.taskWord.variants) {
@@ -239,6 +254,7 @@ export class RusWordsComponent implements OnInit {
 
   save() {
     console.log('wordsSolved:', this.wordsSolved);
+    console.log('words:', this.words);
     // сохраняем только показанные слова
     const words = this.wordsSolved.concat(this.words.filter(item => item.errorCount > 0 || item.successCount > 0));
     this.httpService.saveSession(words);
